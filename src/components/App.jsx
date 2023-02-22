@@ -4,30 +4,30 @@ import { nanoid } from 'nanoid';
 
 import ContactForm from './ContactForm/ContactForm';
 import ContactList from './ContactList/ContactList';
-import Filter from './filter/Filter';
+import Filter from './Filter/Filter';
 import Notification from './Notification/Notification';
-
-const message = 'There is no contacts';
 
 class App extends Component {
   state = {
     contacts: [
-      { id: 'id-1', name: 'Rosie Simpson', number: '4591256' },
-      { id: 'id-2', name: 'Hermione Kline', number: '4438912' },
-      { id: 'id-3', name: 'Eden Clements', number: '6451779' },
-      { id: 'id-4', name: 'Annie Copeland', number: '2279126' },
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
     filter: '',
   };
   addContact = ({ name, number }) => {
     const normalizedName = name.toLowerCase();
 
-    this.state.contacts.forEach(el => {
-      if (el.name.toLowerCase() === normalizedName) {
-        alert(`${name} is already in contacts`);
-        return;
-      }
-    });
+    const alreadyInContacts = this.state.contacts.find(
+      el => el.name.toLowerCase() === normalizedName
+    );
+    if (alreadyInContacts) {
+      alert(`${name} is already in contacts`);
+
+      return;
+    }
     const contact = {
       id: nanoid(),
       name: name,
@@ -48,11 +48,26 @@ class App extends Component {
       contact.name.toLowerCase().includes(normalizedFilter)
     );
   };
-  deleteContact = todoId => {
+  deleteContact = contactId => {
     this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== todoId),
+      contacts: prevState.contacts.filter(contact => contact.id !== contactId),
     }));
   };
+  // //////////////////////
+  // componentDidMount() {
+  //   const contacts = JSON.parse(localStorage.getItem('contacts'));
+  //   if (contacts?.length) {
+  //     this.setState({ contacts });
+  //   }
+  // }
+
+  // componentDidUpdate(prevProps, prevState) {
+  //   const { contacts } = this.state;
+  //   if (contacts.length !== prevState.contacts.length) {
+  //     localStorage.setItem('contacts', JSON.stringify(contacts));
+  //   }
+  // }
+  // /////////////////
   render() {
     const { filter } = this.state;
     const visibleContacts = this.getVisibleContacts();
@@ -62,7 +77,7 @@ class App extends Component {
         <ContactForm onSubmit={this.addContact} />
         <Filter value={filter} onChange={this.changeFilter}></Filter>
         {visibleContacts.length === 0 ? (
-          <Notification message={message} />
+          <Notification message="There is no contacts" />
         ) : (
           <ContactList
             contacts={visibleContacts}
